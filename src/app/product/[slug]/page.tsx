@@ -61,6 +61,7 @@ export default async function ProductPage({ params }: PageProps<"/product/[slug]
     id: v.id,
     name: v.name,
     pricePaisa: v.pricePaisa,
+    compareAtPaisa: v.compareAtPaisa,
     depositPaisa: depositFor(v.pricePaisa, settings.depositPercent),
     // Which photo to show when this finish is selected. -1 when the supplier
     // gave us no per-variant photo, in which case the gallery stays put.
@@ -68,7 +69,7 @@ export default async function ProductPage({ params }: PageProps<"/product/[slug]
   }));
 
   return (
-    <div className="px-5 pt-6 lg:px-12 lg:pt-8">
+    <div className="mx-auto max-w-[1400px] px-3 pb-24 pt-4 lg:px-6 lg:pb-8 lg:pt-6">
       <nav className="label mb-5 text-[11px] text-muted">
         <Link href="/shop" className="hover:text-ink">
           Shop

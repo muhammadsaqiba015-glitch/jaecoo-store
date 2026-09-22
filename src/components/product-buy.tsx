@@ -10,6 +10,7 @@ export interface BuyVariant {
   id: string;
   name: string;
   pricePaisa: number;
+  compareAtPaisa: number | null;
   depositPaisa: number;
   /** Index into `gallery` to show for this finish; -1 when there is none. */
   imageIndex: number;
@@ -67,6 +68,10 @@ export function ProductBuy({
   }
 
   const current = variants.find((v) => v.id === picked) ?? variants[0];
+  const discount =
+    current?.compareAtPaisa && current.compareAtPaisa > current.pricePaisa
+      ? Math.round(((current.compareAtPaisa - current.pricePaisa) / current.compareAtPaisa) * 100)
+      : null;
   const images = gallery.length ? gallery : [];
 
   return (
@@ -117,11 +122,23 @@ export function ProductBuy({
 
       {/* buy column */}
       <div className="flex flex-col">
-        <div className="flex items-baseline gap-3.5">
-          <span className="tnum font-tech text-[26px] font-bold text-ink lg:text-[34px]">
-            {formatPkr(current?.pricePaisa ?? 0)}
-          </span>
-          <span className="text-[13px] text-muted lg:text-[14px]">{current?.name}</span>
+        <div className="bg-flame-soft px-3.5 py-3">
+          <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
+            <span className="tnum text-[30px] font-extrabold leading-none text-flame lg:text-[38px]">
+              {formatPkr(current?.pricePaisa ?? 0)}
+            </span>
+            {discount !== null && (
+              <>
+                <span className="tnum text-[15px] text-faint line-through">
+                  {formatPkr(current!.compareAtPaisa!)}
+                </span>
+                <span className="bg-flame px-1.5 py-0.5 text-[12px] font-bold text-white">
+                  −{discount}%
+                </span>
+              </>
+            )}
+          </div>
+          <div className="mt-1 text-[12.5px] text-body">{current?.name}</div>
         </div>
 
         <div className="label mt-6 text-[13px] text-ink">Choose your finish</div>
@@ -178,7 +195,7 @@ export function ProductBuy({
             type="button"
             onClick={add}
             disabled={pending || !current}
-            className="cut label h-[52px] flex-1 bg-ink text-[15px] font-bold text-white transition-opacity hover:opacity-90 disabled:opacity-50"
+            className="h-[52px] flex-1 bg-flame text-[15px] font-bold uppercase tracking-wide text-white transition-opacity hover:opacity-90 disabled:opacity-50"
           >
             {pending ? "Adding…" : added ? "Added ✓" : "Add to cart"}
           </button>
@@ -194,6 +211,25 @@ export function ProductBuy({
             View cart →
           </a>
         )}
+
+        {/* On a phone the buy button scrolls off long before the customer has
+            finished reading, so it is pinned to the bottom of the viewport. */}
+        <div className="fixed inset-x-0 bottom-0 z-30 flex items-center gap-3 border-t border-line bg-surface px-3 py-2.5 shadow-[0_-2px_10px_rgba(0,0,0,0.08)] lg:hidden">
+          <div className="min-w-0 flex-1">
+            <div className="tnum text-[18px] font-extrabold leading-none text-flame">
+              {formatPkr((current?.pricePaisa ?? 0) * qty)}
+            </div>
+            <div className="truncate text-[11px] text-muted">{current?.name}</div>
+          </div>
+          <button
+            type="button"
+            onClick={add}
+            disabled={pending || !current}
+            className="shrink-0 bg-flame px-6 py-3 text-[14px] font-bold uppercase text-white disabled:opacity-50"
+          >
+            {pending ? "Adding…" : added ? "Added ✓" : "Add to cart"}
+          </button>
+        </div>
 
         <div className="mt-4 grid gap-2.5 sm:grid-cols-2">
           <div className="border border-line bg-surface p-3.5">

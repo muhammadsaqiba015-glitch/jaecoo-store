@@ -1,75 +1,94 @@
 @import "tailwindcss";
 
 /**
- * Jaecoo Accessories design tokens.
+ * Marketplace design tokens.
  *
- * Monochrome by design — the brand language has no accent colour, so amber is
- * reserved for exactly one job: fitment warnings. If something needs to shout,
- * it uses weight, size or the black panel, not a new hue.
+ * The conventions here — warm red actions, price-forward cards, dense grids,
+ * discount badges — are the shared vocabulary of marketplace retail (Daraz,
+ * Temu, Lazada and the rest). The palette and layout below are our own; nothing
+ * is lifted from any particular storefront.
+ *
+ * Colour carries meaning: red is reserved for price and for the one action on
+ * the screen that matters. Using it anywhere else drains it.
  */
 @theme {
-  --color-ink: #0b0d0e;
-  --color-panel: #15181a;
-  --color-panel-2: #23282b;
-  --color-paper: #f2f2f1;
+  /* surfaces */
+  --color-page: #f4f4f4;
   --color-surface: #ffffff;
   --color-sunk: #fafafa;
-  --color-line: #e2e2e0;
-  --color-line-soft: #eeeeec;
-  --color-body: #3d4144;
-  --color-muted: #8c8f90;
-  --color-faint: #a9acad;
-  --color-inverse-muted: #a8abac;
+  --color-line: #e8e8e8;
+  --color-line-soft: #f0f0f0;
 
+  /* text */
+  --color-ink: #1f1f1f;
+  --color-body: #4a4a4a;
+  --color-muted: #8c8c8c;
+  --color-faint: #b0b0b0;
+
+  /* the one accent, and its warmer partner for gradients */
+  --color-flame: #e8400c;
+  --color-flame-deep: #c2340a;
+  --color-ember: #ff7a1a;
+  --color-flame-soft: #fff1ec;
+
+  /* semantic */
+  --color-good: #1a8a4f;
+  --color-good-soft: #eaf6ef;
   --color-warn: #b5760f;
   --color-warn-deep: #8a5a09;
   --color-warn-soft: #fdf6e9;
   --color-warn-line: #e8dcc2;
+  --color-danger: #c22c15;
 
-  --color-good: #1e6b4a;
-  --color-danger: #9e2b1c;
+  /* kept for the admin, which stays sober */
+  --color-panel: #1f1f1f;
+  --color-panel-2: #2e2e2e;
+  --color-paper: #f4f4f4;
+  --color-inverse-muted: #a8a8a8;
 
-  --font-mark: var(--font-michroma), "Chakra Petch", sans-serif;
-  --font-tech: var(--font-chakra), "Barlow Semi Condensed", sans-serif;
-  --font-body: var(--font-barlow), system-ui, sans-serif;
+  /* Marketplace pages use one plain, highly legible sans. The display faces
+     are mapped onto it so existing markup keeps working. */
+  --font-body: var(--font-barlow), system-ui, -apple-system, sans-serif;
+  --font-mark: var(--font-barlow), system-ui, sans-serif;
+  --font-tech: var(--font-barlow), system-ui, sans-serif;
 }
 
-/* The notched corner is the brand's most distinctive detail. */
 @utility cut {
-  clip-path: polygon(
-    0 0,
-    100% 0,
-    100% calc(100% - 13px),
-    calc(100% - 13px) 100%,
-    0 100%
-  );
+  /* The notched corner belonged to the previous direction; marketplace cards
+     are plain rectangles. Kept as a no-op so old markup does not break. */
+  clip-path: none;
 }
 
 @utility cut-sm {
-  clip-path: polygon(
-    0 0,
-    100% 0,
-    100% calc(100% - 9px),
-    calc(100% - 9px) 100%,
-    0 100%
-  );
+  clip-path: none;
 }
 
-/* Wide-tracked uppercase labels, used throughout the brand language. */
 @utility label {
-  font-family: var(--font-tech);
   font-weight: 600;
-  letter-spacing: 0.15em;
+  letter-spacing: 0.06em;
   text-transform: uppercase;
 }
 
+/** The orange-to-red run used on primary actions and the header. */
+@utility flame-gradient {
+  background-image: linear-gradient(90deg, var(--color-ember), var(--color-flame));
+}
+
 body {
-  background: var(--color-paper);
+  background: var(--color-page);
   color: var(--color-body);
   font-family: var(--font-body);
 }
 
-/* Tabular figures wherever money lines up in a column. */
 .tnum {
   font-variant-numeric: tabular-nums;
+}
+
+/** Clamp a product title to two lines — marketplace cards live or die on
+    consistent height, and titles from suppliers vary wildly in length. */
+.clamp-2 {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }

@@ -1,101 +1,73 @@
 import Link from "next/link";
-import { getFeatured, getModelsWithCounts } from "@/lib/catalogue";
+import { getFeatured, getAll, getModelsWithCounts } from "@/lib/catalogue";
 import { ProductCard } from "@/components/product-card";
 import { getSettings } from "@/lib/db";
 
-/**
- * Rebuilt at most once a minute. Product pages are generated at build time, so
- * without this a listing published from the admin would not appear on the site
- * until the next deploy.
- */
 export const revalidate = 60;
 
 export default async function HomePage() {
-  const [featured, models, settings] = await Promise.all([
-    getFeatured(5),
+  const [featured, all, models, settings] = await Promise.all([
+    getFeatured(12),
+    getAll(60),
     getModelsWithCounts(),
     getSettings(),
   ]);
 
-  return (
-    <>
-      {/* hero */}
-      <section className="relative h-[460px] overflow-hidden bg-[linear-gradient(160deg,#23282b_0%,#14181a_48%,#0b0d0e_100%)] lg:h-[620px]">
-        <div
-          className="pointer-events-none absolute -left-8 top-8 select-none whitespace-nowrap font-mark text-[84px] leading-none text-white opacity-[0.045] lg:top-11 lg:text-[168px]"
-          aria-hidden
-        >
-          JAECOO JAECOO
-        </div>
-        <div className="absolute left-5 top-5 h-6 w-9 border-l-2 border-t-2 border-white/55 lg:left-6 lg:top-6 lg:h-[34px] lg:w-14" aria-hidden />
-        <div className="absolute right-5 top-5 h-6 w-9 border-r-2 border-t-2 border-white/55 lg:right-6 lg:top-6 lg:h-[34px] lg:w-14" aria-hidden />
+  // Featured items already appear in the main feed; showing them twice on a
+  // small catalogue makes it look emptier, not fuller.
+  const rest = all.filter((p) => !featured.some((f) => f.slug === p.slug));
 
-        <div className="absolute inset-x-5 bottom-8 flex max-w-[620px] flex-col gap-4 lg:inset-x-auto lg:left-12 lg:bottom-32 lg:gap-5">
-          <h1 className="font-mark text-[26px] leading-[1.25] text-white lg:text-[46px] lg:leading-[1.22]">
-            UPGRADE
-            <br />
-            YOUR JAECOO
+  return (
+    <div className="mx-auto max-w-[1400px] px-2 py-2.5 lg:px-6 lg:py-4">
+      {/* promo strip — compact, because a full-bleed hero pushes the catalogue
+          below the fold, and on a marketplace the catalogue is the point */}
+      <section className="flame-gradient mb-2.5 flex flex-col gap-2 px-4 py-5 text-white sm:flex-row sm:items-center sm:justify-between lg:px-8 lg:py-7">
+        <div>
+          <h1 className="text-[20px] font-extrabold leading-tight lg:text-[28px]">
+            Genuine-fit accessories for your Jaecoo
           </h1>
-          <p className="max-w-[46ch] text-[14px] leading-relaxed text-[#c9cccd] lg:text-[15.5px]">
-            Mats, covers, trim and protection — sourced direct, fitted to your model, delivered
-            across Pakistan.
+          <p className="mt-1 text-[13px] text-white/90 lg:text-[14.5px]">
+            Mats, covers, trim and protection — sourced direct, delivered across Pakistan in{" "}
+            {settings.leadTimeMinDays}–{settings.leadTimeMaxDays} days.
           </p>
-          <div className="flex flex-col gap-2.5 sm:flex-row sm:gap-3">
-            <Link
-              href="/shop"
-              className="cut label flex h-[50px] items-center justify-center gap-2.5 bg-white px-6 text-[13.5px] font-bold text-ink lg:h-[52px] lg:text-[14px]"
-            >
-              Shop accessories
-              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M5 12h13" />
-                <path d="M13 6l6 6-6 6" />
-              </svg>
-            </Link>
-            <Link
-              href="/fitment"
-              className="cut label flex h-[50px] items-center justify-center border border-white/35 bg-white/[0.09] px-6 text-[13.5px] font-bold text-white lg:h-[52px] lg:text-[14px]"
-            >
-              Check fitment
-            </Link>
-          </div>
         </div>
+        <Link
+          href="/shop"
+          className="w-fit shrink-0 bg-white px-5 py-2.5 text-[13.5px] font-bold text-flame hover:bg-white/90"
+        >
+          Shop all
+        </Link>
       </section>
 
       {/* shop by model */}
-      <section className="px-5 pt-10 lg:px-12 lg:pt-14">
-        <div className="mb-5 flex items-baseline justify-between gap-5">
-          <h2 className="font-mark text-[16px] text-ink lg:text-[22px]">SHOP BY MODEL</h2>
-          <span className="label hidden text-[12px] text-muted sm:inline">Fitment guaranteed</span>
-        </div>
-        <div className="grid grid-cols-2 gap-2.5 lg:grid-cols-4 lg:gap-4">
+      <section className="mb-2.5 bg-surface p-3 lg:p-4">
+        <h2 className="mb-2.5 text-[14px] font-bold text-ink">Shop by model</h2>
+        <div className="grid grid-cols-4 gap-2 lg:grid-cols-8">
           {models.map((m) => (
             <Link
               key={m.slug}
               href={`/shop/${m.slug}`}
-              className="cut flex h-32 flex-col justify-between bg-[linear-gradient(155deg,#23282b_0%,#0f1214_100%)] p-4 lg:h-52 lg:p-5"
+              className="flex flex-col items-center gap-1.5 py-2 hover:bg-sunk"
             >
-              <span className="label text-[9px] text-muted lg:text-[10.5px]">{m.kind}</span>
-              <div className="flex flex-col gap-1.5 lg:gap-2">
-                <span className="font-mark text-[18px] text-white lg:text-[25px]">{m.name}</span>
-                <span className="label text-[10.5px] text-[#c9cccd] lg:text-[11.5px]">
-                  {m._count.products} {m._count.products === 1 ? "product" : "products"}
-                </span>
-              </div>
+              <span className="flex h-11 w-11 items-center justify-center rounded-full bg-flame-soft text-[14px] font-extrabold text-flame">
+                {m.name.replace(/[^A-Za-z0-9]/g, "").slice(0, 3)}
+              </span>
+              <span className="text-center text-[11.5px] leading-tight text-body">{m.name}</span>
+              <span className="text-[10px] text-faint">{m._count.products}</span>
             </Link>
           ))}
         </div>
       </section>
 
-      {/* bestsellers */}
       {featured.length > 0 && (
-        <section className="px-5 pt-10 lg:px-12 lg:pt-14">
-          <div className="mb-5 flex items-baseline justify-between gap-5">
-            <h2 className="font-mark text-[16px] text-ink lg:text-[22px]">BESTSELLERS</h2>
-            <Link href="/shop" className="label border-b border-ink pb-0.5 text-[11px] text-ink lg:text-[12px]">
-              View all
+        <section className="mb-2.5 bg-surface p-3 lg:p-4">
+          <div className="mb-2.5 flex items-baseline justify-between gap-4">
+            <h2 className="text-[14px] font-bold text-ink lg:text-[16px]">Featured</h2>
+            <Link href="/shop" className="text-[12.5px] font-semibold text-flame">
+              See all →
             </Link>
           </div>
-          <div className="grid grid-cols-2 gap-3 lg:grid-cols-5 lg:gap-4">
+          <div className="grid grid-cols-2 gap-1.5 sm:grid-cols-3 lg:grid-cols-6 lg:gap-2">
             {featured.map((p) => (
               <ProductCard key={p.slug} p={p} />
             ))}
@@ -103,42 +75,33 @@ export default async function HomePage() {
         </section>
       )}
 
-      {/* fitment strip */}
-      <section className="px-5 pt-10 lg:px-12 lg:pt-14">
-        <div className="cut flex flex-col gap-3.5 bg-ink p-5 lg:flex-row lg:items-center lg:justify-between lg:gap-8 lg:p-8">
-          <div className="flex items-start gap-4 lg:items-center lg:gap-5">
-            <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#ffffff" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" className="shrink-0 lg:h-[30px] lg:w-[30px]">
-              <path d="M12 3l9 16H3l9-16z" />
-              <path d="M12 9v5" />
-              <path d="M12 17.5v.5" />
-            </svg>
-            <div className="flex flex-col gap-1">
-              <span className="font-mark text-[14px] text-white lg:text-[17px]">NOT SURE IT FITS?</span>
-              <span className="text-[13.5px] leading-relaxed text-inverse-muted lg:text-[14px]">
-                Key covers and mats differ by trim and key type. Check yours in thirty seconds
-                before you order.
-              </span>
-            </div>
+      <section className="bg-surface p-3 lg:p-4">
+        <h2 className="mb-2.5 text-[14px] font-bold text-ink lg:text-[16px]">All accessories</h2>
+        {rest.length === 0 && featured.length === 0 ? (
+          <p className="py-10 text-center text-[14px] text-muted">
+            Nothing published yet.
+          </p>
+        ) : (
+          <div className="grid grid-cols-2 gap-1.5 sm:grid-cols-3 lg:grid-cols-6 lg:gap-2">
+            {(rest.length > 0 ? rest : all).map((p) => (
+              <ProductCard key={p.slug} p={p} />
+            ))}
           </div>
-          <Link
-            href="/fitment"
-            className="cut-sm label flex h-11 shrink-0 items-center justify-center bg-white px-6 text-[12.5px] font-bold text-ink lg:h-[46px] lg:text-[13px]"
-          >
-            Fitment guide
-          </Link>
-        </div>
+        )}
       </section>
 
-      {/* delivery expectation — set once, prominently, to stop week-two refund requests */}
-      <section className="px-5 pt-10 lg:px-12 lg:pt-14">
-        <p className="mx-auto max-w-[70ch] text-center text-[14px] leading-relaxed text-muted">
-          Everything is imported to order and reaches you in{" "}
-          <strong className="text-ink">
-            {settings.leadTimeMinDays}–{settings.leadTimeMaxDays} days
-          </strong>
-          . We order from our supplier the day your payment clears, and send tracking when it ships.
-        </p>
+      <section className="mt-2.5 grid gap-1.5 sm:grid-cols-3">
+        {[
+          ["Fitment checked", "Every listing states the model and trim it fits."],
+          ["Sourced direct", "No middleman markup between the factory and you."],
+          ["Pay in full or reserve", `${settings.depositPercent}% deposit holds your order.`],
+        ].map(([title, body]) => (
+          <div key={title} className="bg-surface p-3.5">
+            <div className="text-[13px] font-bold text-ink">{title}</div>
+            <div className="mt-0.5 text-[12.5px] leading-relaxed text-muted">{body}</div>
+          </div>
+        ))}
       </section>
-    </>
+    </div>
   );
 }

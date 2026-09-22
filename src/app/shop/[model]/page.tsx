@@ -35,7 +35,7 @@ export default async function ModelPage({ params }: PageProps<"/shop/[model]">) 
   if (!current) notFound();
 
   return (
-    <div className="px-5 pt-8 lg:px-12 lg:pt-10">
+    <div className="mx-auto max-w-[1400px] px-2 py-2.5 lg:px-6 lg:py-4">
       <div className="mb-6 flex flex-wrap items-center gap-2.5">
         <Link
           href="/shop"
@@ -76,7 +76,7 @@ export default async function ModelPage({ params }: PageProps<"/shop/[model]">) 
           </Link>
         </div>
       ) : (
-        <div className="grid grid-cols-2 gap-3 lg:grid-cols-4 lg:gap-4">
+        <div className="grid grid-cols-2 gap-1.5 sm:grid-cols-3 lg:grid-cols-6 lg:gap-2">
           {products.map((p) => (
             <ProductCard key={p.slug} p={p} />
           ))}

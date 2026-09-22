@@ -68,6 +68,10 @@ model Variant {
 
   costFen     Int         // supplier price in CNY cents
   pricePaisa  Int         // selling price in PKR paisa (cost x rate x markup, then edited)
+  /// What the item usually sells for elsewhere, used for the struck-through
+  /// price. Optional and never auto-filled: a discount against an invented
+  /// "original" price is a lie the customer can check.
+  compareAtPaisa Int?
 
   stock       Int         @default(0) // supplier availability, not our inventory
   position    Int         @default(0)

@@ -22,14 +22,14 @@ export function CartBadge() {
     <Link
       href="/cart"
       aria-label={count ? `Cart, ${count} items` : "Cart"}
-      className="relative text-ink hover:text-muted"
+      className="relative text-white hover:text-white/80"
     >
       <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
         <path d="M6 7h12l-1 13H7L6 7z" />
         <path d="M9 7a3 3 0 0 1 6 0" />
       </svg>
       {count !== null && count > 0 && (
-        <span className="tnum absolute -right-2 -top-1.5 flex h-4 min-w-4 items-center justify-center bg-ink px-1 font-tech text-[10px] font-bold text-white">
+        <span className="tnum absolute -right-2 -top-1.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-white px-1 text-[10px] font-bold text-flame">
           {count}
         </span>
       )}
